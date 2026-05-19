@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(brainstorming)",
+      "Bash(go mod *)",
+      "Bash(go build *)",
+      "Bash(./ocpp-server)",
+      "Bash(curl -s http://localhost:8081/)",
+      "Bash(kill %1)",
+      "Bash(curl -s http://localhost:8081/api/chargepoints)",
+      "Bash(curl -s -I http://localhost:8081/)",
+      "Bash(pkill -f ocpp-server)",
+      "Bash(curl -s http://localhost:8081/ui)",
+      "Read(//Users/andy/DEV/Personal/helm-charts/charts/**)",
+      "Read(//Users/andy/DEV/Personal/helm-charts/**)",
+      "Bash(git init *)",
+      "Bash(git remote *)",
+      "Bash(helm lint *)",
+      "Bash(helm template *)",
+      "Bash(helm-docs)",
+      "Bash(git add *)"
+    ]
+  }
+}
