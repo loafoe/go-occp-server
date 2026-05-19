@@ -25,7 +25,19 @@
       "Bash(gh run *)",
       "Bash(gh api *)",
       "Bash(curl -s https://loafoe.github.io/helm-charts/index.yaml)",
-      "Bash(golangci-lint run *)"
+      "Bash(golangci-lint run *)",
+      "Bash(kubectl get *)",
+      "Bash(kubectl --context rpi get httproutes -A -o wide)",
+      "Bash(kubectl config *)",
+      "Bash(kubectl --context rpi get httproute -n pico-agent pico-agent -o yaml)",
+      "Bash(kubectl --context rpi get gateway -n default gateway -o yaml)",
+      "Bash(kubectl --context rpi create namespace ocpp --dry-run=client -o yaml)",
+      "Bash(kubectl --context rpi apply -f -)",
+      "Bash(helm upgrade *)",
+      "Bash(kubectl *)",
+      "Bash(curl -s https://ocpp.rpi.loafoe.com/ocpp/test)",
+      "Bash(curl *)",
+      "Bash(timeout 5 websocat -H \"Authorization: Basic $\\(echo -n 'wallbox-1:YItbLg873uCYC7iPP7D6dWo3xXCcVfFf')"
     ]
   }
 }

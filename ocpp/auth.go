@@ -96,13 +96,16 @@ func (a *Authenticator) Authenticate(chargePointID, authHeader string) bool {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
 
+	log.Printf("DEBUG Auth: chargePointID=%q, authHeader=%q", chargePointID, authHeader)
+
 	if !a.enabled {
+		log.Printf("DEBUG Auth: authentication disabled, allowing connection")
 		return true
 	}
 
 	expectedPassword, exists := a.credentials[chargePointID]
 	if !exists {
-		log.Printf("Auth failed: unknown charge point ID: %s", chargePointID)
+		log.Printf("Auth failed: unknown charge point ID: %s (known IDs: %v)", chargePointID, a.knownIDs())
 		return false
 	}
 
@@ -114,9 +117,11 @@ func (a *Authenticator) Authenticate(chargePointID, authHeader string) bool {
 	// Parse Basic Auth header
 	username, password, ok := parseBasicAuth(authHeader)
 	if !ok {
-		log.Printf("Auth failed: invalid Authorization header for %s", chargePointID)
+		log.Printf("Auth failed: invalid Authorization header for %s (header: %s)", chargePointID, authHeader)
 		return false
 	}
+
+	log.Printf("DEBUG Auth: parsed username=%q, password=%q, expected=%q", username, password, expectedPassword)
 
 	// Username should match charge point ID
 	if username != chargePointID {
@@ -125,11 +130,20 @@ func (a *Authenticator) Authenticate(chargePointID, authHeader string) bool {
 	}
 
 	if password != expectedPassword {
-		log.Printf("Auth failed: invalid password for %s", chargePointID)
+		log.Printf("Auth failed: invalid password for %s (got %q, expected %q)", chargePointID, password, expectedPassword)
 		return false
 	}
 
+	log.Printf("Auth success: %s authenticated", chargePointID)
 	return true
+}
+
+func (a *Authenticator) knownIDs() []string {
+	ids := make([]string, 0, len(a.credentials))
+	for id := range a.credentials {
+		ids = append(ids, id)
+	}
+	return ids
 }
 
 // parseBasicAuth parses an HTTP Basic Authentication header
