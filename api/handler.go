@@ -48,8 +48,8 @@ type TransactionInfo struct {
 
 // MeterValueInfo represents meter values for API responses
 type MeterValueInfo struct {
-	Timestamp string                 `json:"timestamp"`
-	Values    map[string]interface{} `json:"values"`
+	Timestamp string         `json:"timestamp"`
+	Values    map[string]any `json:"values"`
 }
 
 // RegisterRoutes registers all API routes
@@ -177,7 +177,7 @@ func (h *Handler) handleStatus(w http.ResponseWriter, r *http.Request, cp *ocpp.
 		return
 	}
 
-	h.writeJSON(w, map[string]interface{}{
+	h.writeJSON(w, map[string]any{
 		"id":              cp.ID,
 		"status":          cp.Status,
 		"connectorStatus": cp.ConnectorStatus,
@@ -204,7 +204,7 @@ func (h *Handler) handleMeterValues(w http.ResponseWriter, r *http.Request, cp *
 	for _, mv := range meterValues {
 		info := MeterValueInfo{
 			Timestamp: mv.Timestamp,
-			Values:    make(map[string]interface{}),
+			Values:    make(map[string]any),
 		}
 		for _, sv := range mv.SampledValue {
 			key := sv.Measurand
@@ -340,15 +340,15 @@ func (h *Handler) chargePointToInfo(cp *ocpp.ChargePoint) ChargePointInfo {
 	return info
 }
 
-func (h *Handler) writeJSON(w http.ResponseWriter, data interface{}) {
+func (h *Handler) writeJSON(w http.ResponseWriter, data any) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(data)
+	_ = json.NewEncoder(w).Encode(data)
 }
 
 func (h *Handler) writeError(w http.ResponseWriter, err error) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusInternalServerError)
-	json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+	_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 }
 
 func splitPath(path string) []string {

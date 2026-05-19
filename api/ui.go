@@ -8,9 +8,9 @@ func RegisterUI(mux *http.ServeMux) {
 	mux.HandleFunc("/ui/", serveUI)
 }
 
-func serveUI(w http.ResponseWriter, r *http.Request) {
+func serveUI(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Write([]byte(uiHTML))
+	_, _ = w.Write([]byte(uiHTML))
 }
 
 const uiHTML = `<!DOCTYPE html>

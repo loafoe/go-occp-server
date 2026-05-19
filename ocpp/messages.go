@@ -147,8 +147,8 @@ func ParseMessage(data []byte) (any, error) {
 			return nil, fmt.Errorf("invalid CallError message: expected 5 elements")
 		}
 		var errorCode, errorDesc string
-		json.Unmarshal(raw[2], &errorCode)
-		json.Unmarshal(raw[3], &errorDesc)
+		_ = json.Unmarshal(raw[2], &errorCode)
+		_ = json.Unmarshal(raw[3], &errorDesc)
 		return &CallError{
 			MessageTypeID:    messageType,
 			UniqueID:         uniqueID,

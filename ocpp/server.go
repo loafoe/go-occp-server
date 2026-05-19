@@ -121,7 +121,7 @@ func (s *Server) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleConnection(cp *ChargePoint) {
 	defer func() {
-		cp.conn.Close()
+		_ = cp.conn.Close()
 		s.mu.Lock()
 		delete(s.chargePoints, cp.ID)
 		s.mu.Unlock()
@@ -385,7 +385,7 @@ func (s *Server) handleDataTransfer(cp *ChargePoint, call *Call) ([]byte, error)
 }
 
 // SendCall sends a Call message to a charge point and waits for the response
-func (s *Server) SendCall(ctx context.Context, cpID, action string, payload interface{}) (*CallResult, error) {
+func (s *Server) SendCall(ctx context.Context, cpID, action string, payload any) (*CallResult, error) {
 	cp, ok := s.GetChargePoint(cpID)
 	if !ok {
 		return nil, fmt.Errorf("charge point not found: %s", cpID)
