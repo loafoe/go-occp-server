@@ -15,9 +15,26 @@ import (
 func main() {
 	ocppPort := flag.String("ocpp-port", "8080", "Port for OCPP WebSocket server")
 	apiPort := flag.String("api-port", "8081", "Port for HTTP API server")
+	credentialsFile := flag.String("credentials-file", "", "Path to JSON file with charge point credentials")
 	flag.Parse()
 
 	server := ocpp.NewServer()
+
+	// Load credentials if provided
+	if *credentialsFile != "" {
+		if err := server.Authenticator().LoadFromFile(*credentialsFile); err != nil {
+			log.Fatalf("Failed to load credentials: %v", err)
+		}
+		log.Printf("Authentication enabled from file: %s", *credentialsFile)
+	} else if err := server.Authenticator().LoadFromEnv("OCPP_CREDENTIALS"); err != nil {
+		log.Fatalf("Failed to load credentials from env: %v", err)
+	}
+
+	if server.Authenticator().IsEnabled() {
+		log.Println("Charge point authentication is ENABLED")
+	} else {
+		log.Println("WARNING: Charge point authentication is DISABLED - any charger can connect")
+	}
 
 	// OCPP WebSocket server
 	ocppMux := http.NewServeMux()

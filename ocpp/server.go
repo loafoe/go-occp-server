@@ -46,17 +46,19 @@ type Transaction struct {
 
 // Server represents the OCPP Central System
 type Server struct {
-	chargePoints map[string]*ChargePoint
-	mu           sync.RWMutex
-	upgrader     websocket.Upgrader
-	nextTxID     int
-	txMu         sync.Mutex
+	chargePoints  map[string]*ChargePoint
+	mu            sync.RWMutex
+	upgrader      websocket.Upgrader
+	nextTxID      int
+	txMu          sync.Mutex
+	authenticator *Authenticator
 }
 
 // NewServer creates a new OCPP server
 func NewServer() *Server {
 	return &Server{
-		chargePoints: make(map[string]*ChargePoint),
+		chargePoints:  make(map[string]*ChargePoint),
+		authenticator: NewAuthenticator(),
 		upgrader: websocket.Upgrader{
 			ReadBufferSize:  1024,
 			WriteBufferSize: 1024,
@@ -65,6 +67,11 @@ func NewServer() *Server {
 		},
 		nextTxID: 1,
 	}
+}
+
+// Authenticator returns the server's authenticator
+func (s *Server) Authenticator() *Authenticator {
+	return s.authenticator
 }
 
 // GetChargePoint returns a charge point by ID
@@ -92,6 +99,12 @@ func (s *Server) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	chargePointID := strings.TrimSuffix(path, "/")
 	if chargePointID == "" {
 		http.Error(w, "charge point ID required", http.StatusBadRequest)
+		return
+	}
+
+	// Authenticate if enabled
+	if !s.authenticator.Authenticate(chargePointID, r.Header.Get("Authorization")) {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return
 	}
 
